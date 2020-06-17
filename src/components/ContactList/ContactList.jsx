@@ -10,8 +10,8 @@ const ContactList = ({ contacts, onRemove }) => {
         <section >
           <button type="submit" className={styles.button} onClick={() => onRemove(id)}>Delete</button>
         </section>
-      </li>)}
-
+      </li>)
+      }
     </ul>
   )
 };

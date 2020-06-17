@@ -83,16 +83,19 @@ class App extends Component {
   }
 
   render() {
-    const { filter } = this.state;
+    const { filter, contacts } = this.state;
     const visibleContacts = this.getVisibleContacts();
+    console.log(visibleContacts);
+
 
     return (
       <div className={styles.container}>
         <h1>Phonebook</h1>
         <ContactForm onAddContact={this.AddContacts} />
         <h2>Contacts</h2>
-        {visibleContacts.length > 1 && <Filter value={filter} onChangeFilter={this.changeFilter} />}
-        {visibleContacts.length > 0 && <ContactList contacts={visibleContacts} onRemove={this.RemoveContact} />}
+        {contacts.length > 1 && <Filter value={filter} onChangeFilter={this.changeFilter} />}
+        {contacts.length > 0 && < ContactList contacts={visibleContacts} onRemove={this.RemoveContact} />}
+        {!visibleContacts.length && <div>Not faund</div>}
       </div>
     );
   }
