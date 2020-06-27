@@ -5,15 +5,17 @@ import ContactForm from './ContactForm';
 import ContactList from './ContactList';
 import Filter from './Filter';
 
+//utils
 import { v4 as uuidv4 } from 'uuid';
+import storage from '../utils/storage';
+import { ToastContainer, toast } from 'react-toastify';
 
+//styles
+import 'react-toastify/dist/ReactToastify.css';
 import styles from './ContactForm/ContactForm.module.scss';
 
 
 class App extends Component {
-
-  static propTypes = {};
-  static defaulProps = {};
 
   state = {
     contacts: [
@@ -27,11 +29,12 @@ class App extends Component {
   }
 
   componentDidMount() {
-    const persistedContacts = localStorage.getItem('contacts');
+    const persistedContacts = storage.get("contacts");
 
     if (persistedContacts) {
       this.setState({
-        contacts: JSON.parse(persistedContacts)
+
+        contacts: persistedContacts,
       })
     }
   }
@@ -40,30 +43,18 @@ class App extends Component {
     const { contacts } = this.state;
 
     if (prevState.contacts !== contacts) {
-      localStorage.setItem('contacts', JSON.stringify(contacts))
+      storage.save('contacts', contacts);
     }
   }
 
   AddContacts = (name, number) => {
-    if (!name && !number) {
-      return;
-    }
+    const { contacts } = this.state
+    const newContact = { name, number, id: uuidv4(), }
 
-    this.state.contacts.some(
-      (contact) => contact.name === name)
-      ? alert(name + ` is alredy in contacts`)
-      : this.setState(
-        ({ contacts }) => ({
-          contacts: [
-            ...contacts,
-            {
-              id: uuidv4(),
-              name,
-              number
-            }
-          ],
-        })
-      );
+    if (!name || !number) { return toast.error('Please fill the form!') }
+    else if (name.length < 3) { toast.error('Name should be more then 3 letters') }
+    else if (contacts.some(contact => contact.name === name)) { toast.info(name + ` is alredy in contacts`) }
+    else { this.setState(({ contacts }) => ({ contacts: [...contacts, newContact] })) }
   };
 
   getVisibleContacts = () => {
@@ -96,6 +87,17 @@ class App extends Component {
         {contacts.length > 1 && <Filter value={filter} onChangeFilter={this.changeFilter} />}
         {contacts.length > 0 && < ContactList contacts={visibleContacts} onRemove={this.RemoveContact} />}
         {!visibleContacts.length && <div>Not faund</div>}
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     );
   }
